@@ -32,6 +32,11 @@ function ModalRemote(modalId) {
 
     this.loadingContent = '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>';
 
+    let xhr;
+
+    $(this.modal).on('hidden.bs.modal', function (e) {
+        abortXHR(xhr);
+    });
 
     /**
      * Show the modal
@@ -164,11 +169,11 @@ function ModalRemote(modalId) {
      */
     this.doRemote = function (url, method, data) {
         var instance = this;
-        $.ajax({
+        abortXHR(xhr);
+        xhr = $.ajax({
             url: url,
             method: method,
             data: data,
-            async: false,
             beforeSend: function () {
                 beforeRemoteRequest.call(instance);
             },
@@ -386,6 +391,13 @@ function ModalRemote(modalId) {
                 $(elm).hasAttr('data-request-method') ? $(elm).attr('data-request-method') : 'GET',
                 bulkData
             );
+        }
+    };
+
+    function abortXHR(xhr) {
+        if (xhr && xhr.readyState < 4) {
+            xhr.onreadystatechange = $.noop;
+            xhr.abort();
         }
     }
 } // End of Object
