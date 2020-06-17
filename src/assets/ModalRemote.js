@@ -30,8 +30,11 @@ function ModalRemote(modalId) {
 
     this.footer = $(modalId).find('.modal-footer');
 
-    this.loadingContent = '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>';
-
+    this.loadingContent = 
+        '<div class="progress">' +
+            '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>' + 
+        '</div>';
+    
     let xhr;
 
     $(this.modal).on('hidden.bs.modal', function (e) {
