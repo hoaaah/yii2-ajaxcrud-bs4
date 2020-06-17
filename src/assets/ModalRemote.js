@@ -103,6 +103,44 @@ function ModalRemote(modalId) {
         $(this.content).html(content);
     };
 
+    this.setFocusOnInput = function () {
+        const $content = $(this.content);
+
+        let targetEl;
+        const $autofocusElements = $content.find('input[autofocus], textarea[autofocus]');
+        if ($autofocusElements.length > 0) {
+            targetEl = $autofocusElements.last()[0];
+        } else {
+            const $inputElements = $content.find('input, textarea');
+            if ($inputElements.length > 0) {
+                targetEl = $autofocusElements.first()[0];
+            }
+        }
+
+        if (targetEl && document.activeElement !== targetEl) {
+            try {
+                document.activeElement.blur();
+            } catch (e) { console.log(e); }
+
+            // Chrome does not allow to focus input until it is rendered. MutationObserver does not help
+            const intervalMs = 50;
+            const maxAttempts = 40;
+            let attempt = -1;
+            function setFocus() {
+                attempt++;
+                if (document.activeElement === targetEl ||
+                    attempt >= maxAttempts
+                ) {
+                    return;
+                }
+
+                targetEl.focus();
+                setTimeout(setFocus, intervalMs);
+            }
+            setFocus();
+        }
+    }
+
     /**
      * Set modal footer
      * @param {string} content The content of modal footer
@@ -243,8 +281,10 @@ function ModalRemote(modalId) {
         if (response.title !== undefined)
             this.setTitle(response.title);
 
-        if (response.content !== undefined)
+        if (response.content !== undefined) {
             this.setContent(response.content);
+            this.setFocusOnInput();
+        }
 
         if (response.footer !== undefined)
             this.setFooter(response.footer);
