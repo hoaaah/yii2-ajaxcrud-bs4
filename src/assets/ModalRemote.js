@@ -30,8 +30,16 @@ function ModalRemote(modalId) {
 
     this.footer = $(modalId).find('.modal-footer');
 
-    this.loadingContent = '<div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>';
+    this.loadingContent = 
+        '<div class="progress">' +
+            '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>' + 
+        '</div>';
+    
+    let xhr;
 
+    $(this.modal).on('hidden.bs.modal', function (e) {
+        abortXHR(xhr);
+    });
 
     /**
      * Show the modal
@@ -94,6 +102,44 @@ function ModalRemote(modalId) {
     this.setContent = function (content) {
         $(this.content).html(content);
     };
+
+    this.setFocusOnInput = function () {
+        const $content = $(this.content);
+
+        let targetEl;
+        const $autofocusElements = $content.find('input[autofocus], textarea[autofocus]');
+        if ($autofocusElements.length > 0) {
+            targetEl = $autofocusElements.last()[0];
+        } else {
+            const $inputElements = $content.find('input, textarea');
+            if ($inputElements.length > 0) {
+                targetEl = $autofocusElements.first()[0];
+            }
+        }
+
+        if (targetEl && document.activeElement !== targetEl) {
+            try {
+                document.activeElement.blur();
+            } catch (e) { console.log(e); }
+
+            // Chrome does not allow to focus input until it is rendered. MutationObserver does not help
+            const intervalMs = 50;
+            const maxAttempts = 40;
+            let attempt = -1;
+            function setFocus() {
+                attempt++;
+                if (document.activeElement === targetEl ||
+                    attempt >= maxAttempts
+                ) {
+                    return;
+                }
+
+                targetEl.focus();
+                setTimeout(setFocus, intervalMs);
+            }
+            setFocus();
+        }
+    }
 
     /**
      * Set modal footer
@@ -164,11 +210,11 @@ function ModalRemote(modalId) {
      */
     this.doRemote = function (url, method, data) {
         var instance = this;
-        $.ajax({
+        abortXHR(xhr);
+        xhr = $.ajax({
             url: url,
             method: method,
             data: data,
-            async: false,
             beforeSend: function () {
                 beforeRemoteRequest.call(instance);
             },
@@ -235,8 +281,10 @@ function ModalRemote(modalId) {
         if (response.title !== undefined)
             this.setTitle(response.title);
 
-        if (response.content !== undefined)
+        if (response.content !== undefined) {
             this.setContent(response.content);
+            this.setFocusOnInput();
+        }
 
         if (response.footer !== undefined)
             this.setFooter(response.footer);
@@ -386,6 +434,13 @@ function ModalRemote(modalId) {
                 $(elm).hasAttr('data-request-method') ? $(elm).attr('data-request-method') : 'GET',
                 bulkData
             );
+        }
+    };
+
+    function abortXHR(xhr) {
+        if (xhr && xhr.readyState < 4) {
+            xhr.onreadystatechange = $.noop;
+            xhr.abort();
         }
     }
 } // End of Object
