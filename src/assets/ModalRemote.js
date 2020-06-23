@@ -157,7 +157,7 @@ function ModalRemote(modalId) {
         // remove old title
         $(this.header).find('h4.modal-title').remove();
         // add new title
-        $(this.header).append('<h4 class="modal-title">' + title + '</h4>');
+        $(this.header).prepend('<h4 class="modal-title">' + title + '</h4>');
     };
 
     /**
