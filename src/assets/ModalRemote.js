@@ -30,11 +30,11 @@ function ModalRemote(modalId) {
 
     this.footer = $(modalId).find('.modal-footer');
 
-    this.loadingContent = 
+    this.loadingContent =
         '<div class="progress">' +
-            '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>' + 
+        '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>' +
         '</div>';
-    
+
     let xhr;
 
     $(this.modal).on('hidden.bs.modal', function (e) {
@@ -155,9 +155,9 @@ function ModalRemote(modalId) {
      */
     this.setTitle = function (title) {
         // remove old title
-        $(this.header).find('h4.modal-title').remove();
+        $(this.header).find('h5.modal-title').remove();
         // add new title
-        $(this.header).prepend('<h4 class="modal-title">' + title + '</h4>');
+        $(this.header).prepend('<h5 class="modal-title">' + title + '</h5>');
     };
 
     /**
@@ -263,9 +263,9 @@ function ModalRemote(modalId) {
         if (response.forceReload !== undefined && response.forceReload) {
             if (response.forceReload == 'true') {
                 // Backwards compatible reload of fixed crud-datatable-pjax
-                $.pjax.reload({container: '#crud-datatable-pjax'});
+                $.pjax.reload({ container: '#crud-datatable-pjax' });
             } else {
-                $.pjax.reload({container: response.forceReload});
+                $.pjax.reload({ container: response.forceReload });
             }
         }
 
@@ -350,37 +350,37 @@ function ModalRemote(modalId) {
             this.setTitle(title);
         }
         // Add form for user input if required
-        this.setContent('<form id="ModalRemoteConfirmForm">'+message);
+        this.setContent('<form id="ModalRemoteConfirmForm">' + message);
 
         var instance = this;
         if (okLabel !== false) {
-	        this.addFooterButton(
-	            okLabel === undefined ? this.defaults.okLabel : okLabel,
-	            'submit',
-	            'btn btn-primary',
-	            function (e) {
-	                var data;
-	
-	                // Test if browser supports FormData which handles uploads
-	                if (window.FormData) {
-	                    data = new FormData($('#ModalRemoteConfirmForm')[0]);
-	                    if (typeof selectedIds !== 'undefined' && selectedIds)
-	                        data.append('pks', selectedIds.join());
-	                } else {
-	                    // Fallback to serialize
-	                    data = $('#ModalRemoteConfirmForm');
-	                    if (typeof selectedIds !== 'undefined' && selectedIds)
-	                        data.pks = selectedIds;
-	                    data = data.serializeArray();
-	                }
-	
-	                instance.doRemote(
-	                    dataUrl,
-	                    dataRequestMethod,
-	                    data
-	                );
-	            }
-	        );
+            this.addFooterButton(
+                okLabel === undefined ? this.defaults.okLabel : okLabel,
+                'submit',
+                'btn btn-primary',
+                function (e) {
+                    var data;
+
+                    // Test if browser supports FormData which handles uploads
+                    if (window.FormData) {
+                        data = new FormData($('#ModalRemoteConfirmForm')[0]);
+                        if (typeof selectedIds !== 'undefined' && selectedIds)
+                            data.append('pks', selectedIds.join());
+                    } else {
+                        // Fallback to serialize
+                        data = $('#ModalRemoteConfirmForm');
+                        if (typeof selectedIds !== 'undefined' && selectedIds)
+                            data.pks = selectedIds;
+                        data = data.serializeArray();
+                    }
+
+                    instance.doRemote(
+                        dataUrl,
+                        dataRequestMethod,
+                        data
+                    );
+                }
+            );
         }
 
         this.addFooterButton(
@@ -418,7 +418,7 @@ function ModalRemote(modalId) {
          * Show either a local confirm modal or get modal content through ajax
          */
         if ($(elm).hasAttr('data-confirm-title') || $(elm).hasAttr('data-confirm-message')) {
-            this.confirmModal (
+            this.confirmModal(
                 $(elm).attr('data-confirm-title'),
                 $(elm).attr('data-confirm-message'),
                 $(elm).attr('data-confirm-alert') ? false : $(elm).attr('data-confirm-ok'),
